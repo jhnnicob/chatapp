@@ -5,6 +5,7 @@ import java.util.*;
 
 public class ChatServer {
 	private Socket socket;
+	private ServerSocket serverSocket;
 	private int port;
 	private Set<String> userNames = new HashSet<>();
 	private Set<UserThread> userThreads = new HashSet<>();
@@ -14,14 +15,18 @@ public class ChatServer {
 		this.port = port;
 	}
 
+	/**
+	 * wrap the execution of the socket inside this method
+	 */
 	public void execute() throws IOException {
 
-		ServerSocket serverSocket = new ServerSocket(port);
+		serverSocket = new ServerSocket(port);
 
 		System.out.println("Chat Server is listening on port " + port);
 
-		while (true) {
-			try {
+		try {
+			while (true) {
+
 				socket = serverSocket.accept();
 				System.out.println("New user connected: " + socket.getRemoteSocketAddress());
 
@@ -31,12 +36,12 @@ public class ChatServer {
 				UserThread newUser = new UserThread(this, socket, reader, writer);
 				userThreads.add(newUser);
 				newUser.start();
-
-			} catch (Exception e) {
-				serverSocket.close();
-				socket.close();
-				e.printStackTrace();
 			}
+		} catch (Exception e) {
+			// e.printStackTrace();
+		} finally {
+			serverSocket.close();
+			socket.close();
 		}
 
 	}
@@ -66,6 +71,10 @@ public class ChatServer {
 		}
 	}
 
+	void close() throws IOException {
+		serverSocket.close();
+	}
+
 	/**
 	 * Stores username of the newly connected client.
 	 */
@@ -84,6 +93,9 @@ public class ChatServer {
 		}
 	}
 
+	/**
+	 * get the user names of the clients
+	 */
 	Set<String> getUserNames() {
 		return this.userNames;
 	}
@@ -97,19 +109,23 @@ public class ChatServer {
 	}
 
 	/**
-	 * Save all the logs into a text file
+	 * get all logs
 	 */
-
 	List<String> getLogs() {
 		return logs;
 	}
 
+	/**
+	 * set logs into the array list
+	 */
 	void setLogs(String log) {
 		this.logs.add(log);
-		System.out.println(this.logs);
 	}
 
-	public synchronized void saveLogs() {
+	/**
+	 * Save all logs into a text file
+	 */
+	public void saveLogs() {
 
 		FileOutputStream fos = null;
 		File file;
@@ -127,21 +143,16 @@ public class ChatServer {
 			fos.write(bytesArray);
 			fos.flush();
 
-			System.out.println("File Written Successfully");
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				System.out.println("This is the logs.");
-				if (fos != null) {
-					fos.close();
-				}
-			} catch (IOException ioe) {
-				System.out.println("Error in closing the Stream");
-				ioe.printStackTrace();
+			if (fos != null) {
+				fos.close();
 			}
-		}
 
+		} catch (IOException e) {
+			// e.printStackTrace();
+		} finally {
+			System.out.println("Save logs successfully");
+			System.out.println("Connection terminated");
+		}
 	}
 
 }

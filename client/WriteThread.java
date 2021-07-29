@@ -3,8 +3,8 @@ import java.net.*;
 import java.util.*;
 
 /**
- * This thread is responsible for reading user's input and send it to the
- * server. It runs in an infinite loop until the user types 'bye' to quit.
+ * This thread is responsible for reading user's/ client's input and send it to
+ * the server. It runs in an infinite loop until the user types 'bye' to quit.
  *
  */
 
@@ -23,13 +23,16 @@ public class WriteThread extends Thread {
     public void run() {
 
         try {
+
             Scanner scanner = new Scanner(System.in);
             System.out.print("Enter your name: ");
+
             String userName = scanner.nextLine();
             writer.writeUTF(userName); // send user to the server
             client.setUserName(userName);
 
             String text;
+
             while (true) {
                 System.out.print("[" + userName + "]:");
                 text = scanner.nextLine();
@@ -37,7 +40,6 @@ public class WriteThread extends Thread {
                     writer.writeUTF(text); // it sends message to the server
                 } else {
                     writer.writeUTF(text);
-                    // socket.close();
                     System.out.println("Connection terminated");
                     break;
                 }

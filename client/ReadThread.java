@@ -21,6 +21,7 @@ public class ReadThread extends Thread {
     }
 
     public void run() {
+
         String response;
 
         try {
@@ -38,7 +39,7 @@ public class ReadThread extends Thread {
             socket.close();
 
         } catch (IOException ex) {
-            ex.printStackTrace();
+            // ex.printStackTrace();
         }
     }
 }

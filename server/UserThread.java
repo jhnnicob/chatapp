@@ -35,28 +35,12 @@ public class UserThread extends Thread {
             server.broadcast(serverMessage, this);
 
             String clientMessage;
-
             while ((clientMessage = reader.readUTF()) != null) {
-                if (!(clientMessage.equalsIgnoreCase("bye"))) {
 
-                    serverMessage = "[" + userName + "]: " + clientMessage;
-                    server.broadcast(serverMessage, this);
-
-                    this.destination = getDestination(userName);
-
-                    String strDestination = destination.toString().replaceAll("(^\\[|\\]$)", "");
-                    String date = new Date().toString();
-                    String to = !destination.isEmpty() ? " To " + strDestination + ": " : ": ";
-
-                    String logs = "\n" + date + " " + userName + to + clientMessage;
-
-                    server.setLogs(logs);
-
-                } else {
+                if (clientMessage.equalsIgnoreCase("bye")) {
 
                     server.removeUser(userName, this);
                     serverMessage = userName + " has quitted.";
-
                     server.broadcast(serverMessage, this);
 
                     if (server.getUserNames().isEmpty()) {
@@ -66,25 +50,40 @@ public class UserThread extends Thread {
 
                         if (text.equalsIgnoreCase("y")) {
                             server.saveLogs();
+                            server.close();
                             break;
                         } else if (text.equalsIgnoreCase("n")) {
+                            server.close();
                             break;
                         }
                         scanner.close();
-
                     } else {
                         break;
                     }
+
+                } else {
+
+                    serverMessage = "[" + userName + "]: " + clientMessage;
+                    server.broadcast(serverMessage, this);
+
+                    this.destination = getDestination(userName);
+
+                    String strDestination = destination.toString().replaceAll("(^\\[|\\]$)", "");
+                    String date = new Date().toString();
+                    String to = !destination.isEmpty() ? " To " + strDestination + ": " : ": ";
+                    String logs = "\n" + date + " " + userName + to + clientMessage;
+
+                    System.out.print(logs);
+
+                    server.setLogs(logs);
+
                 }
             }
 
-            socket.close();
-
+        } catch (SocketException se) {
+            // se.printStackTrace();
         } catch (IOException ex) {
-            System.out.println("Error in user thread " + ex.getMessage());
-            ex.printStackTrace();
-        } finally {
-
+            // ex.printStackTrace();
         }
     }
 
@@ -105,15 +104,5 @@ public class UserThread extends Thread {
             }
         }
         return usernames;
-    }
-
-    /**
-     * Remove users from destination array
-     */
-    void removeDestination(String currentUser) {
-        boolean removed = usernames.remove(currentUser);
-        if (removed) {
-            usernames.remove(currentUser);
-        }
     }
 }

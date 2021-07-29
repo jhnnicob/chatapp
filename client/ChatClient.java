@@ -14,8 +14,10 @@ public class ChatClient {
 		this.portNo = portNo;
 	}
 
+	/**
+	 * wrap the execution of the socket inside this method
+	 */
 	public void execute() {
-
 		try {
 			Socket socket = new Socket(ipAddress, portNo); // for connecting to the server
 
@@ -33,26 +35,24 @@ public class ChatClient {
 		}
 	}
 
+	/**
+	 * Set username
+	 */
 	void setUserName(String userName) {
 		this.userName = userName;
 	}
 
+	/**
+	 * Get username
+	 */
 	String getUserName() {
 		return this.userName;
-	}
-
-	void setConfMsg(String confMsg) {
-		this.confMsg = confMsg;
-	}
-
-	String getConfMsg() {
-		return this.confMsg;
 	}
 
 	public static void main(String[] args) {
 
 		System.out.println("Enter the IP address followed by port number");
-		System.out.println("i.e: <IP address> <port number>");
+		System.out.println("Usage: ChatClient <IP address> <port number>");
 
 		Scanner scanner = new Scanner(System.in);
 		String socketAddress = scanner.nextLine();
@@ -65,7 +65,9 @@ public class ChatClient {
 			portNo = Integer.parseInt(tokens[1]);
 		}
 
+		// Create an instance of the ChatClient class
 		ChatClient client = new ChatClient(ipAddress, portNo);
+		// use the instance to execute the socket in execute method
 		client.execute();
 	}
 }
