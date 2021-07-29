@@ -15,6 +15,7 @@ public class UserThread extends Thread {
     private DataOutputStream writer;
     private Set<String> usernames = new HashSet<>();
     List<String> logsList = new ArrayList<String>();
+    private Set<String> destination = new HashSet<String>();
 
     public UserThread(ChatServer server, Socket socket, DataInputStream reader, DataOutputStream writer) {
         this.socket = socket;
@@ -28,11 +29,9 @@ public class UserThread extends Thread {
         try {
 
             String userName = reader.readUTF(); // get user from the client
-
+            this.destination = getDestination(userName);
             server.addUserName(userName);
-
             String serverMessage = "New user connected: " + userName;
-
             server.broadcast(serverMessage, this);
 
             String clientMessage;
@@ -43,37 +42,49 @@ public class UserThread extends Thread {
                     serverMessage = "[" + userName + "]: " + clientMessage;
                     server.broadcast(serverMessage, this);
 
-                    String destination = getDestination(userName).toString().replaceAll("(^\\[|\\]$)", "");
-                    String to = !destination.isEmpty() ? " To " + destination + ": " : ": ";
+                    this.destination = getDestination(userName);
+
+                    String strDestination = destination.toString().replaceAll("(^\\[|\\]$)", "");
                     String date = new Date().toString();
+                    String to = !destination.isEmpty() ? " To " + strDestination + ": " : ": ";
 
                     String logs = "\n" + date + " " + userName + to + clientMessage;
-                    System.out.println(logs);
 
-                    this.logsList.add(logs);
+                    server.setLogs(logs);
 
                 } else {
+
                     server.removeUser(userName, this);
                     serverMessage = userName + " has quitted.";
+
                     server.broadcast(serverMessage, this);
 
-                    Scanner scanner = new Scanner(System.in);
-                    System.out.println("Do you want to save logs?(Y/N) ");
-                    String txtLogs = scanner.nextLine();
-                    if (txtLogs.equalsIgnoreCase("y")) {
-                        saveLogs();
+                    if (server.getUserNames().isEmpty()) {
+                        Scanner scanner = new Scanner(System.in);
+                        System.out.print("Do you want to save the logs?(Y/N): ");
+                        String text = scanner.nextLine();
+
+                        if (text.equalsIgnoreCase("y")) {
+                            server.saveLogs();
+                            break;
+                        } else if (text.equalsIgnoreCase("n")) {
+                            break;
+                        }
+                        scanner.close();
+
+                    } else {
+                        break;
                     }
-                    scanner.close();
-                    socket.close();
-                    break;
                 }
             }
 
-        } catch (
+            socket.close();
 
-        IOException ex) {
+        } catch (IOException ex) {
             System.out.println("Error in user thread " + ex.getMessage());
             ex.printStackTrace();
+        } finally {
+
         }
     }
 
@@ -84,44 +95,25 @@ public class UserThread extends Thread {
         writer.writeUTF(message);
     }
 
+    /**
+     * Get the destination or user that the message is going to
+     */
     Set<String> getDestination(String currentUser) {
-        for (String username : server.getUserNames()) {
-            if (username != currentUser) {
-                usernames.add(username);
+        for (String strUserName : server.getUserNames()) {
+            if (strUserName != currentUser) {
+                usernames.add(strUserName);
             }
         }
         return usernames;
     }
 
-    public synchronized void saveLogs() {
-        File file;
-        FileOutputStream fos = null;
-        System.out.println("This is the logs.");
-
-        try {
-
-            file = new File("serverlogs.txt");
-            fos = new FileOutputStream(file, true);
-
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-
-            byte[] bytesArray = this.logsList.toString().replaceAll("(^\\[|\\]$)", "").getBytes();
-
-            fos.write(bytesArray);
-            fos.flush();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (fos != null) {
-                    fos.close();
-                }
-            } catch (IOException ioe) {
-                System.out.println("Error in closing the Stream");
-            }
+    /**
+     * Remove users from destination array
+     */
+    void removeDestination(String currentUser) {
+        boolean removed = usernames.remove(currentUser);
+        if (removed) {
+            usernames.remove(currentUser);
         }
     }
 }

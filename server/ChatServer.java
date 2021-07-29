@@ -8,6 +8,7 @@ public class ChatServer {
 	private int port;
 	private Set<String> userNames = new HashSet<>();
 	private Set<UserThread> userThreads = new HashSet<>();
+	private List<String> logs = new ArrayList<String>();
 
 	public ChatServer(int port) {
 		this.port = port;
@@ -30,12 +31,14 @@ public class ChatServer {
 				UserThread newUser = new UserThread(this, socket, reader, writer);
 				userThreads.add(newUser);
 				newUser.start();
+
 			} catch (Exception e) {
 				serverSocket.close();
 				socket.close();
 				e.printStackTrace();
 			}
 		}
+
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -92,4 +95,53 @@ public class ChatServer {
 	boolean hasUsers() {
 		return !this.userNames.isEmpty();
 	}
+
+	/**
+	 * Save all the logs into a text file
+	 */
+
+	List<String> getLogs() {
+		return logs;
+	}
+
+	void setLogs(String log) {
+		this.logs.add(log);
+		System.out.println(this.logs);
+	}
+
+	public synchronized void saveLogs() {
+
+		FileOutputStream fos = null;
+		File file;
+
+		try {
+			file = new File("serverlogs.txt");
+			fos = new FileOutputStream(file);
+
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+
+			byte[] bytesArray = this.logs.toString().replaceAll("(^\\[|\\]$)", "").getBytes();
+
+			fos.write(bytesArray);
+			fos.flush();
+
+			System.out.println("File Written Successfully");
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				System.out.println("This is the logs.");
+				if (fos != null) {
+					fos.close();
+				}
+			} catch (IOException ioe) {
+				System.out.println("Error in closing the Stream");
+				ioe.printStackTrace();
+			}
+		}
+
+	}
+
 }

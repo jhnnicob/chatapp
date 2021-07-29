@@ -22,7 +22,9 @@ public class ReadThread extends Thread {
 
     public void run() {
         String response;
+
         try {
+
             while ((response = reader.readUTF()) != null) {
                 System.out.println("\n" + response);
 
@@ -31,8 +33,12 @@ public class ReadThread extends Thread {
                     System.out.print("[" + client.getUserName() + "]: ");
                 }
             }
+
+            reader.close();
+            socket.close();
+
         } catch (IOException ex) {
-            // System.exit(1);
+            ex.printStackTrace();
         }
     }
 }

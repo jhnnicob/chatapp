@@ -42,14 +42,8 @@ public class WriteThread extends Thread {
                     break;
                 }
             }
-
-            System.out.print("Do you want to save the logs?(y/n)");
-            String confirmantion = scanner.nextLine();
-
-            if (text.equalsIgnoreCase("y")) {
-                writer.writeUTF(text);
-            }
-
+            writer.close();
+            socket.close();
         } catch (IOException ex) {
             System.out.println("Error writing to server: " + ex.getMessage());
         }

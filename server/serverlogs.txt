@@ -1,12 +1,4 @@
-[
-Wed Jul 28 20:53:31 SGT 2021
-john To [nico] Hi john][
-Wed Jul 28 20:53:43 SGT 2021
-nico To [john] Oh how are you][
-Wed Jul 28 20:57:07 SGT 2021john To [nico] This the most awesome program that I built so far][
-Wed Jul 28 20:57:48 SGT 2021nico To [john] hahaha realy?][
-Wed Jul 28 21:01:48 SGT 2021Molon To [nico] Hey molon here]
-Wed Jul 28 21:06:35 SGT 2021 NIco To []: Hi
-Wed Jul 28 21:08:53 SGT 2021 pickels To john: Hi nico
-Wed Jul 28 21:09:02 SGT 2021 john To pickels: hey 
-Wed Jul 28 21:10:18 SGT 2021 He everybody To pickels, john: yes this is my name
+
+Thu Jul 29 12:03:04 SGT 2021 nico: My name is Nico and I want to be six figure software developer, 
+Thu Jul 29 12:03:47 SGT 2021 kirito: This is kirito and I am a swords man, 
+Thu Jul 29 12:04:27 SGT 2021 asuna To kirito: Asuna here and I am a , don't know hahaha
